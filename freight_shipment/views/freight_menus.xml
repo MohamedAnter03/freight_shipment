@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_freight_root"
+              name="Freight"
+              web_icon="freight_shipment,static/description/icon.png"
+              groups="group_freight_user"
+              sequence="55"/>
+
+    <menuitem id="menu_freight_shipments"
+              name="Shipments"
+              parent="menu_freight_root"
+              action="action_freight_shipment"
+              sequence="10"/>
+
+    <menuitem id="menu_freight_configuration"
+              name="Configuration"
+              parent="menu_freight_root"
+              groups="group_freight_manager"
+              sequence="90"/>
+
+    <menuitem id="menu_freight_shipment_types"
+              name="Shipment Types"
+              parent="menu_freight_configuration"
+              action="action_freight_shipment_type"
+              sequence="10"/>
+
+</odoo>

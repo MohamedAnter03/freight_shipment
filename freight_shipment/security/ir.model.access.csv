@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_freight_shipment_type_user,freight.shipment.type.user,model_freight_shipment_type,group_freight_user,1,0,0,0
+access_freight_shipment_type_manager,freight.shipment.type.manager,model_freight_shipment_type,group_freight_manager,1,1,1,1
+access_freight_shipment_user,freight.shipment.user,model_freight_shipment,group_freight_user,1,1,1,1
+access_freight_cargo_line_user,freight.cargo.line.user,model_freight_cargo_line,group_freight_user,1,1,1,1

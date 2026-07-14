@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="freight_shipment_type_view_list" model="ir.ui.view">
+        <field name="name">freight.shipment.type.view.list</field>
+        <field name="model">freight.shipment.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category"/>
+                <field name="shipment_count" string="Shipments"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="freight_shipment_type_view_form" model="ir.ui.view">
+        <field name="name">freight.shipment.type.view.form</field>
+        <field name="model">freight.shipment.type</field>
+        <field name="arch" type="xml">
+            <form string="Shipment Type">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_shipments" type="object"
+                                class="oe_stat_button" icon="fa-truck">
+                            <field name="shipment_count" widget="statinfo" string="Shipments"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Road Freight"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="e.g. ROAD"/>
+                            <field name="category"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="freight_shipment_type_view_search" model="ir.ui.view">
+        <field name="name">freight.shipment.type.view.search</field>
+        <field name="model">freight.shipment.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="filter_inactive" string="Archived" domain="[('active', '=', False)]"/>
+                <group name="group_by">
+                    <filter name="group_by_category" string="Category" context="{'group_by': 'category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_freight_shipment_type" model="ir.actions.act_window">
+        <field name="name">Shipment Types</field>
+        <field name="res_model">freight.shipment.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="freight_shipment_type_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first shipment type
+            </p>
+            <p>
+                Shipment types (e.g. Road, Air, Ocean, Parcel) classify shipment
+                requests. Archive a type to hide it without losing history.
+            </p>
+        </field>
+    </record>
+
+</odoo>

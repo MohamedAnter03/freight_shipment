@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="freight_shipment_view_list" model="ir.ui.view">
+        <field name="name">freight.shipment.view.list</field>
+        <field name="model">freight.shipment</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="shipment_type_id"/>
+                <field name="origin" optional="show"/>
+                <field name="destination" optional="show"/>
+                <field name="pickup_date" optional="show"/>
+                <field name="delivery_date" optional="show"/>
+                <field name="total_weight" sum="Total Weight" optional="show"/>
+                <field name="total_volume" sum="Total Volume" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'preparing'"
+                       decoration-warning="state in ('with_courier', 'on_the_way')"
+                       decoration-success="state == 'delivered'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="freight_shipment_view_kanban" model="ir.ui.view">
+        <field name="name">freight.shipment.view.kanban</field>
+        <field name="model">freight.shipment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" records_draggable="0" quick_create="false">
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="fw-bold"><field name="name"/></div>
+                        <field name="partner_id"/>
+                        <div class="text-muted">
+                            <field name="origin"/> → <field name="destination"/>
+                        </div>
+                        <footer class="pt-1">
+                            <field name="shipment_type_id" widget="badge"/>
+                            <div class="ms-auto text-muted">
+                                <field name="total_weight"/> kg
+                            </div>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="freight_shipment_view_form" model="ir.ui.view">
+        <field name="name">freight.shipment.view.form</field>
+        <field name="model">freight.shipment</field>
+        <field name="arch" type="xml">
+            <form string="Shipment Request">
+                <header>
+                    <button name="action_hand_to_courier" type="object"
+                            string="Hand to Courier" class="btn-primary"
+                            invisible="state != 'preparing'"
+                            help="Cargo is ready and the shipment is handed over to the courier."/>
+                    <button name="action_start_delivery" type="object"
+                            string="Start Delivery" class="btn-primary"
+                            invisible="state != 'with_courier'"
+                            help="The courier is on the way to the destination."/>
+                    <button name="action_mark_delivered" type="object"
+                            string="Mark as Delivered" class="btn-primary"
+                            invisible="state != 'on_the_way'"
+                            help="The customer received the shipment."/>
+                    <button name="%(action_report_shipment_order)d" type="action"
+                            string="Print Shipment Order"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="General">
+                            <field name="partner_id"/>
+                            <field name="shipment_type_id"
+                                   readonly="state != 'preparing'"/>
+                        </group>
+                        <group string="Route &amp; Schedule">
+                            <field name="origin" readonly="state == 'delivered'"/>
+                            <field name="destination" readonly="state == 'delivered'"/>
+                            <field name="pickup_date" readonly="state == 'delivered'"/>
+                            <field name="delivery_date" readonly="state == 'delivered'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Cargo" name="cargo">
+                            <field name="cargo_line_ids" readonly="state == 'delivered'">
+                                <list editable="bottom">
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="weight"/>
+                                    <field name="volume"/>
+                                    <field name="total_weight" sum="Total Weight"/>
+                                    <field name="total_volume" sum="Total Volume"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_weight"/>
+                                <field name="total_volume"/>
+                            </group>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note" placeholder="Internal notes about this shipment..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="freight_shipment_view_search" model="ir.ui.view">
+        <field name="name">freight.shipment.view.search</field>
+        <field name="model">freight.shipment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Shipment"
+                       filter_domain="['|', '|', ('name', 'ilike', self), ('origin', 'ilike', self), ('destination', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <field name="shipment_type_id"/>
+                <filter name="filter_preparing" string="Preparing" domain="[('state', '=', 'preparing')]"/>
+                <filter name="filter_with_courier" string="With Courier" domain="[('state', '=', 'with_courier')]"/>
+                <filter name="filter_on_the_way" string="On the Way" domain="[('state', '=', 'on_the_way')]"/>
+                <filter name="filter_delivered" string="Delivered" domain="[('state', '=', 'delivered')]"/>
+                <separator/>
+                <filter name="filter_pickup_date" string="Requested Pickup Date" date="pickup_date"/>
+                <group name="group_by">
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_type" string="Shipment Type" context="{'group_by': 'shipment_type_id'}"/>
+                    <filter name="group_by_partner" string="Customer" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_freight_shipment" model="ir.actions.act_window">
+        <field name="name">Shipments</field>
+        <field name="res_model">freight.shipment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="freight_shipment_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register your first shipment request
+            </p>
+            <p>
+                Track each shipment from preparation to delivery and print
+                the shipment order for the driver.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="shipment_type_road" model="freight.shipment.type">
+        <field name="name">Road</field>
+        <field name="code">ROAD</field>
+        <field name="category">land</field>
+    </record>
+    <record id="shipment_type_air" model="freight.shipment.type">
+        <field name="name">Air</field>
+        <field name="code">AIR</field>
+        <field name="category">air</field>
+    </record>
+    <record id="shipment_type_ocean" model="freight.shipment.type">
+        <field name="name">Ocean</field>
+        <field name="code">OCEAN</field>
+        <field name="category">sea</field>
+    </record>
+    <record id="shipment_type_parcel" model="freight.shipment.type">
+        <field name="name">Parcel</field>
+        <field name="code">PARCEL</field>
+        <field name="category">other</field>
+    </record>
+
+</odoo>
